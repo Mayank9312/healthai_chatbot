@@ -77,10 +77,10 @@ Edit
 
 📸 Screenshot
 
-<h2>💬 Chatbot UI</h2>
+## 💬 Chatbot UI
 
 <p align="center">
-  <img src="screenshots/chatbot_ui.png" alt="Chatbot UI Screenshot" width="600"/>
+  <img src="screenshots/chatbot_ui.png" alt="Chatbot UI Screenshot" width="600">
 </p>
 
 
