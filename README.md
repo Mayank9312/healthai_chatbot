@@ -77,7 +77,12 @@ Edit
 
 📸 Screenshot
 
-![Chatbot UI](screenshots/chatbot_ui.png)
+<h2>💬 Chatbot UI</h2>
+
+<p align="center">
+  <img src="screenshots/chatbot_ui.png" alt="Chatbot UI Screenshot" width="600"/>
+</p>
+
 
 👨‍💻 Author
 Mayank Bhardwaj – GitHub | LinkedIn
