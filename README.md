@@ -79,9 +79,7 @@ Edit
 
 ## 💬 Chatbot UI
 
-<p align="center">
-  <img src="screenshots/chatbot_ui.png" alt="Chatbot UI Screenshot" width="600">
-</p>
+![Chatbot UI Screenshot](screenshots/chatbot_ui.png)
 
 
 👨‍💻 Author
