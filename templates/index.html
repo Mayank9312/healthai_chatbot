@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AI Health Chatbot</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f4f7;
+      margin: 0;
+      padding: 0;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .chat-container {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 1rem;
+      background: white;
+      min-height: 100vh;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .message {
+      padding: 10px 15px;
+      margin: 10px 0;
+      border-radius: 20px;
+      max-width: 70%;
+      word-wrap: break-word;
+      display: inline-block;
+    }
+
+    .user {
+      background: #d1e7dd;
+      color: #0f5132;
+      align-self: flex-end;
+      margin-left: auto;
+    }
+
+    .bot {
+      background: #e2e3e5;
+      color: #41464b;
+      align-self: flex-start;
+      margin-right: auto;
+    }
+
+    .chat-box {
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+      overflow-y: auto;
+    }
+
+    #loading {
+      display: none;
+      text-align: center;
+      margin: 10px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+      flex-grow: 1;
+    }
+
+    button {
+      padding: 10px 15px;
+      border-radius: 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    .input-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding-top: 15px;
+    }
+
+    .top-controls {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    /* Dark Theme Styles */
+    body.dark {
+      background: #121212;
+      color: #eee;
+    }
+
+    body.dark .chat-container {
+      background: #1e1e1e;
+    }
+
+    body.dark .message.user {
+      background: #0d6efd;
+      color: #fff;
+    }
+
+    body.dark .message.bot {
+      background: #2d2d2d;
+      color: #ccc;
+    }
+
+    body.dark input[type="text"] {
+      background: #2d2d2d;
+      color: white;
+      border: 1px solid #555;
+    }
+
+    body.dark button {
+      background-color: #444;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <div class="top-controls">
+      <h2>💬 AI Health Chatbot</h2>
+      <button onclick="toggleTheme()">🌗 Toggle Theme</button>
+    </div>
+
+    <div class="chat-box" id="chat-box"></div>
+    <div id="loading">⏳ Thinking...</div>
+
+    <div class="input-row">
+      <input type="text" id="user-input" placeholder="Describe your health issue..." />
+      <button onclick="sendMessage()">Send</button>
+      <button onclick="startListening()" title="Speak your query 🎙️">🎤</button>
+    </div>
+
+    <div style="text-align: right; padding-top: 10px;">
+      <button onclick="saveChat()">💾 Save Chat</button>
+    </div>
+  </div>
+
+  <script>
+    async function sendMessage() {
+      const input = document.getElementById("user-input");
+      const message = input.value.trim();
+      if (!message) return;
+
+      addMessage(message, "user");
+      input.value = "";
+      document.getElementById("loading").style.display = "block";
+
+      try {
+        const response = await fetch("/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ message })
+        });
+
+        const data = await response.json();
+        addMessage(data.response, "bot");
+      } catch (err) {
+        addMessage("❌ Sorry, something went wrong.", "bot");
+      }
+
+      document.getElementById("loading").style.display = "none";
+    }
+
+    function addMessage(text, sender) {
+      const chatBox = document.getElementById("chat-box");
+      const div = document.createElement("div");
+      div.className = `message ${sender}`;
+      div.innerText = text;
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+    }
+
+    function startListening() {
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = 'en-US';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      recognition.onresult = function (event) {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById("user-input").value = transcript;
+      };
+
+      recognition.onerror = function (event) {
+        alert("Voice recognition error: " + event.error);
+      };
+
+      recognition.start();
+    }
+
+    function saveChat() {
+      const chatBox = document.getElementById("chat-box");
+      let text = "";
+
+      chatBox.querySelectorAll('.message').forEach(msg => {
+        const role = msg.classList.contains("user") ? "You" : "Bot";
+        text += `${role}: ${msg.innerText}\n`;
+      });
+
+      const blob = new Blob([text], { type: "text/plain" });
+      const link = document.createElement("a");
+      link.download = "chat_history.txt";
+      link.href = window.URL.createObjectURL(blob);
+      link.click();
+    }
+  </script>
+</body>
+</html>
